@@ -25,13 +25,22 @@ class CustomTextField extends StatelessWidget {
     return TextFormField(
       controller: controller,
       decoration: InputDecoration(
-        labelText: labelText,
+        filled: true,
+        fillColor: Colors.white,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
         ),
-        prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
+        prefixIcon: prefixIcon != null
+            ? Icon(
+                prefixIcon,
+                color: const Color.fromARGB(255, 185, 183, 183),
+              )
+            : null,
         suffixIcon: suffixIcon,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        hintStyle: TextStyle(color: const Color.fromARGB(255, 193, 190, 190)),
       ),
       obscureText: obscureText,
       keyboardType: keyboardType,

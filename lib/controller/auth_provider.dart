@@ -7,6 +7,23 @@ class AuthProvider extends ChangeNotifier {
   final ApiService _apiService = ApiService();
   final StorageService _storageService = StorageService();
 
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  bool obscurePassword = true;
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
+  void togglePasswordVisibility() {
+    obscurePassword = !obscurePassword;
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
   User? _user;
   bool _isLoading = false;
   String? _errorMessage;

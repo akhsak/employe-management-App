@@ -33,7 +33,8 @@ class MyApp extends StatelessWidget {
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           ),
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
@@ -52,7 +53,7 @@ class MyApp extends StatelessWidget {
                 body: Center(child: CircularProgressIndicator()),
               );
             }
-            
+
             final isLoggedIn = snapshot.data ?? false;
             return isLoggedIn ? const HomeScreen() : const LoginScreen();
           },

@@ -4,7 +4,10 @@ import '../services/api_service.dart';
 
 class EmployeeProvider extends ChangeNotifier {
   final ApiService _apiService = ApiService();
-  
+   final firstNameController = TextEditingController();
+  final lastNameController = TextEditingController();
+  final phoneController = TextEditingController();
+
   List<Employee> _employees = [];
   Employee? _selectedEmployee;
   bool _isLoading = false;
@@ -20,7 +23,7 @@ class EmployeeProvider extends ChangeNotifier {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
-    
+
     try {
       _employees = await _apiService.getEmployees();
       _isLoading = false;
@@ -37,7 +40,7 @@ class EmployeeProvider extends ChangeNotifier {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
-    
+
     try {
       _selectedEmployee = await _apiService.getEmployeeById(id);
       _isLoading = false;
@@ -54,20 +57,20 @@ class EmployeeProvider extends ChangeNotifier {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
-    
+
     try {
       final success = await _apiService.updateEmployee(employee);
-      
+
       if (success) {
         _selectedEmployee = employee;
-        
+
         // Update employee in the list
         final index = _employees.indexWhere((e) => e.id == employee.id);
         if (index != -1) {
           _employees[index] = employee;
         }
       }
-      
+
       _isLoading = false;
       notifyListeners();
       return success;

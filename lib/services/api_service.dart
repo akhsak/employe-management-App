@@ -11,7 +11,10 @@ class ApiService {
   Future<User> login(String email, String password) async {
     final response = await http.post(
       Uri.parse(loginUrl),
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': 'reqres-free-v1', //  API key here
+      },
       body: jsonEncode({
         'email': email,
         'password': password,

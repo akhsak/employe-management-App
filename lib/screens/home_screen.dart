@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:king_labs_task/controller/auth_provider.dart';
 import 'package:king_labs_task/controller/employee_provider.dart';
@@ -18,7 +19,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // Fetch employees when the screen loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<EmployeeProvider>(context, listen: false).fetchEmployees();
     });
@@ -27,7 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _logout() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     await authProvider.logout();
-    
+
     if (!mounted) return;
     Navigator.pushReplacement(
       context,
@@ -48,54 +48,98 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
     final employeeProvider = Provider.of<EmployeeProvider>(context);
-    
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Employees'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: _logout,
-          ),
-        ],
-      ),
-      body: RefreshIndicator(
-        onRefresh: () => employeeProvider.fetchEmployees(),
+      backgroundColor: const Color(0xFFF0F9FF),
+      body: SafeArea(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                'Welcome, ${authProvider.user?.email ?? "User"}',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+            // Header with gradient
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(24),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFF009DDC), Color(0xFF005F73)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(40),
+                  bottomRight: Radius.circular(40),
                 ),
               ),
-            ),
-            Expanded(
-              child: employeeProvider.isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : employeeProvider.employees.isEmpty
-                      ? const Center(child: Text('No employees found'))
-                      : ListView.builder(
-                          itemCount: employeeProvider.employees.length,
-                          itemBuilder: (context, index) {
-                            final employee = employeeProvider.employees[index];
-                            return EmployeeCard(
-                              employee: employee,
-                              onPressed: () => _navigateToEmployeeDetail(employee.id),
-                            );
-                          },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Employes',
+                        style: TextStyle(
+                          fontSize: 26,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
                         ),
+                      ),
+                      IconButton(
+                        icon: const Icon(CupertinoIcons.square_arrow_right,
+                            color: Colors.white),
+                        onPressed: _logout,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Welcome, ${authProvider.user?.email ?? "User"}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            // List of Employees
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: () => employeeProvider.fetchEmployees(),
+                child: employeeProvider.isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : employeeProvider.employees.isEmpty
+                        ? const Center(
+                            child: Text(
+                              'No employees found',
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          )
+                        : ListView.builder(
+                            padding: const EdgeInsets.all(16),
+                            itemCount: employeeProvider.employees.length,
+                            itemBuilder: (context, index) {
+                              final employee =
+                                  employeeProvider.employees[index];
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 12),
+                                child: EmployeeCard(
+                                  employee: employee,
+                                  onPressed: () =>
+                                      _navigateToEmployeeDetail(employee.id),
+                                ),
+                              );
+                            },
+                          ),
+              ),
             ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: const Color(0xFF005F73),
         onPressed: () => employeeProvider.fetchEmployees(),
-        child: const Icon(Icons.refresh),
+        child: const Icon(CupertinoIcons.refresh, color: Colors.white),
       ),
     );
   }

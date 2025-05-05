@@ -68,7 +68,10 @@ class EmployeeCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                child: const Text('Details'),
+                child: Text(
+                  'Details',
+                  style: TextStyle(color: Color(0xFF005F73)),
+                ),
               ),
             ],
           ),

@@ -8,10 +8,8 @@ import '../widgets/custom_text_field.dart';
 class EmployeeDetailScreen extends StatefulWidget {
   final int employeeId;
 
-  const EmployeeDetailScreen({
-    Key? key,
-    required this.employeeId,
-  }) : super(key: key);
+  const EmployeeDetailScreen({Key? key, required this.employeeId})
+      : super(key: key);
 
   @override
   State<EmployeeDetailScreen> createState() => _EmployeeDetailScreenState();
@@ -19,15 +17,12 @@ class EmployeeDetailScreen extends StatefulWidget {
 
 class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _firstNameController = TextEditingController();
-  final _lastNameController = TextEditingController();
-  final _phoneController = TextEditingController();
+
   bool _isEditing = false;
 
   @override
   void initState() {
     super.initState();
-    // Fetch employee details when the screen loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<EmployeeProvider>(context, listen: false)
           .getEmployeeById(widget.employeeId);
@@ -35,20 +30,24 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
   }
 
   @override
+  @override
   void dispose() {
-    _firstNameController.dispose();
-    _lastNameController.dispose();
-    _phoneController.dispose();
+    final employeeProvider =
+        Provider.of<EmployeeProvider>(context, listen: false);
+    employeeProvider.firstNameController.dispose();
+    employeeProvider.lastNameController.dispose();
+    employeeProvider.phoneController.dispose();
     super.dispose();
   }
 
   void _toggleEditing() {
-    final employee =
-        Provider.of<EmployeeProvider>(context, listen: false).selectedEmployee;
+    final employeeProvider =
+        Provider.of<EmployeeProvider>(context, listen: false);
+    final employee = employeeProvider.selectedEmployee;
     if (employee != null && !_isEditing) {
-      _firstNameController.text = employee.firstName;
-      _lastNameController.text = employee.lastName;
-      _phoneController.text = employee.phone;
+      employeeProvider.firstNameController.text = employee.firstName;
+      employeeProvider.lastNameController.text = employee.lastName;
+      employeeProvider.phoneController.text = employee.phone;
     }
 
     setState(() {
@@ -65,10 +64,10 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
       if (employee != null) {
         final updatedEmployee = Employee(
           id: employee.id,
-          firstName: _firstNameController.text.trim(),
-          lastName: _lastNameController.text.trim(),
+          firstName: employeeProvider.firstNameController.text.trim(),
+          lastName: employeeProvider.lastNameController.text.trim(),
           email: employee.email,
-          phone: _phoneController.text.trim(),
+          phone: employeeProvider.phoneController.text.trim(),
           image: employee.image,
           gender: employee.gender,
           address: employee.address,
@@ -81,8 +80,6 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
           if (!mounted) return;
           Fluttertoast.showToast(
             msg: 'Employee updated successfully',
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
             backgroundColor: Colors.green,
             textColor: Colors.white,
           );
@@ -91,8 +88,6 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
           if (!mounted) return;
           Fluttertoast.showToast(
             msg: employeeProvider.errorMessage ?? 'Failed to update employee',
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
             backgroundColor: Colors.red,
             textColor: Colors.white,
           );
@@ -103,24 +98,21 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
 
   Widget _buildDetailItem(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: 100,
-            child: Text(
-              '$label:',
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
+          Text(
+            "$label: ",
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF005F73),
             ),
           ),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(fontSize: 16),
+              style: const TextStyle(fontSize: 15),
             ),
           ),
         ],
@@ -129,73 +121,69 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
   }
 
   Widget _buildEmployeeDetails(Employee employee) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Center(
-          child: CircleAvatar(
-            radius: 60,
-            backgroundImage: NetworkImage(employee.image),
-          ),
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      margin: const EdgeInsets.only(bottom: 16),
+      elevation: 3,
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: CircleAvatar(
+                radius: 50,
+                backgroundImage: NetworkImage(employee.image),
+              ),
+            ),
+            const SizedBox(height: 20),
+            _buildDetailItem('Name', employee.fullName),
+            _buildDetailItem('Email', employee.email),
+            _buildDetailItem('Phone', employee.phone),
+            _buildDetailItem('Gender', employee.gender),
+            _buildDetailItem('Address', employee.address.fullAddress),
+            _buildDetailItem('Company', employee.company.name),
+            _buildDetailItem('Position', employee.company.title),
+            _buildDetailItem('Department', employee.company.department),
+          ],
         ),
-        const SizedBox(height: 20),
-        _buildDetailItem('Name', employee.fullName),
-        _buildDetailItem('Email', employee.email),
-        _buildDetailItem('Phone', employee.phone),
-        _buildDetailItem('Gender', employee.gender),
-        _buildDetailItem('Address', employee.address.fullAddress),
-        _buildDetailItem('Company', employee.company.name),
-        _buildDetailItem('Position', employee.company.title),
-        _buildDetailItem('Department', employee.company.department),
-      ],
+      ),
     );
   }
 
   Widget _buildEditForm(Employee employee) {
+    final employeProvider = context.read<EmployeeProvider>();
     return Form(
       key: _formKey,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Center(
             child: CircleAvatar(
-              radius: 60,
+              radius: 50,
               backgroundImage: NetworkImage(employee.image),
             ),
           ),
           const SizedBox(height: 20),
           CustomTextField(
-            controller: _firstNameController,
+            controller: employeProvider.firstNameController,
             labelText: 'First Name',
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter first name';
-              }
-              return null;
-            },
+            validator: (value) =>
+                value!.isEmpty ? 'Please enter first name' : null,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           CustomTextField(
-            controller: _lastNameController,
+            controller: employeProvider.lastNameController,
             labelText: 'Last Name',
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter last name';
-              }
-              return null;
-            },
+            validator: (value) =>
+                value!.isEmpty ? 'Please enter last name' : null,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           CustomTextField(
-            controller: _phoneController,
+            controller: employeProvider.phoneController,
             labelText: 'Phone',
             keyboardType: TextInputType.phone,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter phone number';
-              }
-              return null;
-            },
+            validator: (value) =>
+                value!.isEmpty ? 'Please enter phone number' : null,
           ),
           const SizedBox(height: 16),
           _buildDetailItem('Email', employee.email),
@@ -204,6 +192,23 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
           _buildDetailItem('Company', employee.company.name),
           _buildDetailItem('Position', employee.company.title),
           _buildDetailItem('Department', employee.company.department),
+          SizedBox(
+            height: 10,
+          ),
+          ElevatedButton(
+            onPressed: _saveChanges,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF005F73),
+              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: const Text(
+              'Save',
+              style: TextStyle(color: Colors.white, fontSize: 16),
+            ),
+          ),
         ],
       ),
     );
@@ -215,12 +220,27 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
     final employee = employeeProvider.selectedEmployee;
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF0F9FF),
       appBar: AppBar(
-        title: Text(employee?.fullName ?? 'Employee Details'),
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: Icon(Icons.arrow_back_ios),
+          color: Colors.white,
+        ),
+        backgroundColor: const Color(0xFF005F73),
+        title: Text(
+          employee?.fullName ?? 'Employee Details',
+          style: TextStyle(color: Colors.white),
+        ),
         actions: [
           if (employee != null)
             IconButton(
-              icon: Icon(_isEditing ? Icons.close : Icons.edit),
+              icon: Icon(
+                _isEditing ? Icons.close : Icons.edit,
+                color: Colors.white,
+              ),
               onPressed: _toggleEditing,
             ),
         ],
@@ -230,17 +250,11 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
           : employee == null
               ? const Center(child: Text('Employee not found'))
               : SingleChildScrollView(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(16),
                   child: _isEditing
                       ? _buildEditForm(employee)
                       : _buildEmployeeDetails(employee),
                 ),
-      floatingActionButton: _isEditing
-          ? FloatingActionButton(
-              onPressed: _saveChanges,
-              child: const Icon(Icons.save),
-            )
-          : null,
     );
   }
 }

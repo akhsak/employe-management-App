@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:king_labs_task/controller/auth_provider.dart';
+import 'package:king_labs_task/controller/employee_provider.dart';
 import 'package:provider/provider.dart';
-import 'providers/auth_provider.dart';
-import 'providers/employee_provider.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
 import 'services/storage_service.dart';

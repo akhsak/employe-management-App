@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:king_labs_task/controller/employee_provider.dart';
 import 'package:provider/provider.dart';
 import '../models/employee.dart';
-import '../providers/employee_provider.dart';
 import '../widgets/custom_text_field.dart';
 
 class EmployeeDetailScreen extends StatefulWidget {

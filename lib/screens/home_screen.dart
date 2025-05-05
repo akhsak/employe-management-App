@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:king_labs_task/controller/auth_provider.dart';
+import 'package:king_labs_task/controller/employee_provider.dart';
 import 'package:provider/provider.dart';
-import '../providers/auth_provider.dart';
-import '../providers/employee_provider.dart';
+
 import '../widgets/employee_card.dart';
 import 'employee_detail_screen.dart';
 import 'login_screen.dart';
@@ -88,3 +89,14 @@ class _HomeScreenState extends State<HomeScreen> {
                             );
                           },
                         ),
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => employeeProvider.fetchEmployees(),
+        child: const Icon(Icons.refresh),
+      ),
+    );
+  }
+}
